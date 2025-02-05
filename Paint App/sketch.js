@@ -56,7 +56,7 @@ function mousePressed(){
   }
 }
 function mouseDragged(){
-  if(mouseX > 40){
+  if(mouseX > 40 && mouseY > 30){
     stroke(selectedColor);
 
     if(selectedColor == 'white'){
