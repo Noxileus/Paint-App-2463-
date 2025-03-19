@@ -8,7 +8,7 @@ let isMuted = false;
 let muteButton;
 let clearButton;
 
-const piano = new Tone.Synth({
+const piano = new Tone.Synth({  
   oscillator: {
     type: 'sine'},
   envelope:{
@@ -30,8 +30,8 @@ const guitar = new Tone.Synth({
   }
 }).toDestination();
 
-piano.volume.value = -15;
-guitar.volume.value = -18;
+piano.volume.value = -50;
+guitar.volume.value = -55;
 
 const melody = new Tone.Sequence((time, note) => {
   piano.triggerAttackRelease(note, "4n", time);
@@ -40,16 +40,26 @@ const melody = new Tone.Sequence((time, note) => {
 
 Tone.Transport.start();
 
-const splatSound = new Tone.MembraneSynth({
-  pitchDelay: 0.01, 
-  octaves: 6, 
+const splatSound = new Tone.NoiseSynth({
+  noise:{
+    type: 'pink'
+  }, 
   envelope: {
-    attack: 0.005,
+    attack: 0.01,
     decay: 0.1, 
     sustain: 0, 
     release: 0.05, 
-  }
+  }, 
+  volume: -70
 }).toDestination();
+
+const filter = new Tone.Filter({
+  type: 'lowpaass', 
+  frequency: 800, 
+  rolloff: -24
+}).toDestination();
+
+splatSound.connect(filter);
 
 const clearSound = new Tone.NoiseSynth({
   volume: -10, 
@@ -73,8 +83,7 @@ const changeColorSound = new Tone.Synth({
 }).toDestination();
 
 function playSplat(){
-  const randomPitch = Math.random() * 200 + 200;
-  splatSound.triggerAttackRelease(randomPitch, "16n");
+  splatSound.triggerAttackRelease("16n");
 }
 
 const pianoLoop = new Tone.Loop((time) => {
@@ -110,6 +119,8 @@ function setup() {
   clearButton.style('height', boxSize + 'px');
   clearButton.style('font-size', '10px');
   clearButton.mousePressed(clearCanvas);
+
+  Tone.context.resume();
 }
 
 function toggleMusic(){
@@ -186,6 +197,7 @@ function mouseDragged(){
       strokeWeight(20);
     } else{
     strokeWeight(5);
+    playSplat();
     }
     line(pmouseX, pmouseY, mouseX, mouseY);
 
